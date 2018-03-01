@@ -19,6 +19,7 @@ library:
   dependencies:
   - turtle
   - text
+  - aeson
 
 executables:
   kubepacity:
@@ -30,6 +31,9 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - kubepacity
+    - aeson
+    - turtle
+    - text
 
 tests:
   kubepacity-test:
