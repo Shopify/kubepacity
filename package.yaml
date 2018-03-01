@@ -16,6 +16,9 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - turtle
+  - text
 
 executables:
   kubepacity:
