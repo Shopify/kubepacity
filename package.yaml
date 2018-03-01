@@ -44,5 +44,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - text
     - kubepacity
     - hspec

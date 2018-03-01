@@ -16,8 +16,8 @@ import GHC.Generics
 newtype PodSet = PodSet { items :: [Pod] }
   deriving (Show, Eq, Generic, FromJSON)
 
-parser :: Parser Text
-parser = optText "context" 'c' "the context to visualize"
+parser :: Parser Context
+parser = Context <$> optText "context" 'c' "the context to visualize"
 
 -- A WIP main for messing around with parsing.
 main :: IO ()

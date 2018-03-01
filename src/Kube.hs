@@ -2,6 +2,8 @@
 module Kube
         ( getNodeNames
         , getPods
+        , Context(..)
+        , NodeName(..)
         ) where
 
 import Turtle
@@ -11,10 +13,10 @@ newtype Context  = Context Text
 newtype NodeName = NodeName Text
 newtype Command  = Command Text
 
-getNodeNames :: Context -> IO [Text]
+getNodeNames :: Context -> IO [NodeName]
 getNodeNames context = do
   blob <- strict $ kubectl context (Command "get nodes -o jsonpath={.items[*].metadata.name}")
-  return $ Text.words blob
+  return $ map NodeName (Text.words blob)
 
 getPods :: Context -> NodeName -> Shell Line
 getPods context nodeName =
@@ -22,8 +24,8 @@ getPods context nodeName =
   where
     nodePods :: NodeName -> Command
     nodePods (NodeName nodeName) =
-      Command $ "get pods --all-namespaces --field-selector spec.nodeName=" 
-              <> nodeName 
+      Command $ "get pods --all-namespaces --field-selector spec.nodeName="
+              <> nodeName
               <> ",status.phase!=Succeeded,status.phase!=Failed -o json"
 
 kubectl :: Context -> Command -> Shell Line
