@@ -7,20 +7,28 @@ module Kube
 import Turtle
 import qualified Data.Text as Text (words)
 
+newtype Context  = Context Text
+newtype NodeName = NodeName Text
+newtype Command  = Command Text
+
+getNodeNames :: Context -> IO [Text]
 getNodeNames context = do
-  blob <- strict $ kubectl context "get nodes -o jsonpath={.items[*].metadata.name}"
+  blob <- strict $ kubectl context (Command "get nodes -o jsonpath={.items[*].metadata.name}")
   return $ Text.words blob
 
+getPods :: Context -> NodeName -> Shell Line
 getPods context nodeName =
-  kubectl context $
-    "get pods --all-namespaces --field-selector "
-  <> nodePods nodeName
-  <> " -o json"
+  kubectl context $ nodePods nodeName
   where
-    nodePods nodeName =
-      "spec.nodeName=" <> nodeName <> ",status.phase!=Succeeded,status.phase!=Failed"
+    nodePods :: NodeName -> Command
+    nodePods (NodeName nodeName) =
+      Command $ "get pods --all-namespaces --field-selector spec.nodeName=" 
+              <> nodeName 
+              <> ",status.phase!=Succeeded,status.phase!=Failed -o json"
 
+kubectl :: Context -> Command -> Shell Line
 kubectl context command =
-  inproc "kubectl" args empty
+  inproc "kubectl" (args context command) empty
   where
-    args = ["--context", context] <> Text.words command
+    args :: Context -> Command -> [Text]
+    args (Context context) (Command command) = ["--context", context] <> Text.words command
