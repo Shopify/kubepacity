@@ -1,0 +1,41 @@
+name: kubepacity
+version: 0.1.0.0
+github: "Shopify/kubepacity"
+license: BSD3
+author: "Jake Pittis"
+maintainer: "jake.pittis@shopify.com"
+copyright: "2018 Shopify"
+
+extra-source-files:
+- README.md
+
+description: Please see the README on Github at <https://github.com/Shopify/kubepacity#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  kubepacity-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - kubepacity
+
+tests:
+  kubepacity-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - kubepacity
+    - hspec
