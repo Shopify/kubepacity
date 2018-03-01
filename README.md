@@ -8,3 +8,7 @@ Visualizing kubernetes capacity.
 - `stack build`
 - `stack test`
 - `stack exec kubepacity`
+
+### Dependencies
+
+- Requires a working kubectl.
