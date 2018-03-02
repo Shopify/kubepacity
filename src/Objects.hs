@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 module Objects
         ( Pod(..)
@@ -10,42 +10,23 @@ import Data.Aeson
 import Control.Monad (forM)
 import Control.Applicative (optional)
 
+import GHC.Generics
+
 data Pod = Pod
   { name       :: Text
   , containers :: [Container]
-  } deriving (Show, Eq)
+  } deriving (Show, Eq, Generic)
 
 data Container = Container
   { cname      :: Text
-  , cpuRequest :: Maybe Text
-  , memRequest :: Maybe Text
-  } deriving (Show, Eq)
+  , requests   :: Maybe Request
+  } deriving (Show, Eq, Generic)
 
-instance FromJSON Pod where
-  parseJSON = withObject "pod" $ \o -> do
-    metadata <- o        .: "metadata"
-    name     <- metadata .: "name"
+data Request = Request
+  { cpu :: Maybe Text
+  , memory :: Maybe Text
+  } deriving (Show, Eq, Generic)
 
-    spec       <- o    .: "spec"
-    containers <- spec .: "containers"
-
-    cnames <- forM containers $ \container -> do
-      cname      <- container .: "name"
-
-      cpuRequest <- optional (container .: "resources") >>= \case
-        Nothing        -> return Nothing
-        Just resources ->
-          optional (resources .: "requests") >>= \case
-            Nothing       -> return Nothing
-            Just requests -> optional (requests .: "cpu")
-
-      memoryRequest <- optional (container .: "resources") >>= \case
-        Nothing        -> return Nothing
-        Just resources ->
-          optional (resources .: "requests") >>= \case
-            Nothing       -> return Nothing
-            Just requests -> optional (requests .: "memory")
-
-      return (Container cname cpuRequest memoryRequest)
-
-    return (Pod name cnames)
+instance FromJSON Pod
+instance FromJSON Container
+instance FromJSON Request
